@@ -7,6 +7,7 @@ const mapBtn = document.getElementById("map-view");
 
 // conteneurs pour les vues
 const cardsOfBirds = document.getElementById("cards-of-birds");
+const tableOfBirds = document.getElementById("list-of-birds");
 const listOfBirds = document.getElementById("dynamic-list-of-birds");
 
 // Filtres
@@ -242,11 +243,11 @@ function drawMap(foundBird) {
 function showListMode() {
     filtres.classList.add("hidden");
     cardsOfBirds.classList.add("hidden");
-    listOfBirds.classList.remove("hidden");
+    tableOfBirds.classList.remove("hidden");
 }
 
 function showCardMode() {
-    listOfBirds.classList.add("hidden");
+    tableOfBirds.classList.add("hidden");
     filtres.classList.remove("hidden");
     cardsOfBirds.classList.remove("hidden");
 }
