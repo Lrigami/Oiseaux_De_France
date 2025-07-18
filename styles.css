@@ -130,6 +130,7 @@ nav p {
 h2 {
     font-size: 2.5rem;
     color: var(--important-text);
+    text-align: center;
 }
 
 #views {
@@ -263,6 +264,14 @@ th, td {
     padding: 3px 10px;
 }
 
+th button {
+    width: 100%;
+    height: 50px;
+    border: none;
+    border-radius: unset;
+    background-color: var(--neutral-zone);
+}
+
 .bird-link {
     cursor: pointer;
 }
@@ -370,4 +379,47 @@ legend ul li {
 footer {
     width: 100%;
     min-height: 8dvh;
+}
+
+/* media queries */
+@media screen and (max-width: 650px) {
+    nav {
+        font-size: 12px;
+    }
+
+    nav img {
+        margin: 0 10px;
+    }
+
+    nav p {
+        margin: 0 5px;
+    }
+
+    #views ul {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    th, td {
+        margin: 0;
+        font-size: 0.8rem;
+    }
+
+    th {
+        padding: 0;
+    }
+
+    td {
+        padding-left: 3px 0;
+    }
+
+    #popup {
+        width: 93dvw;
+        left: unset;
+        top: calc(50% - 25dvh);
+    }
+
+    #infos-oiseau {
+        flex-direction: column;
+    }
 }
