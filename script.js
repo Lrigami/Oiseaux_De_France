@@ -306,6 +306,8 @@ function drawRepZoneMap(foundBird) {
     const zoneRepHeight = 500;
     const svg = d3.select(zoneRepartition);
 
+    const g = svg.append("g");
+
     const projection = d3.geoMercator()
     .scale(130)
     .translate([zoneRepWidth / 2, zoneRepHeight / 1.5]);
@@ -314,7 +316,7 @@ function drawRepZoneMap(foundBird) {
 
     d3.json("./countries.json")
     .then(function(geojsonData) {
-        svg.selectAll("path")
+        g.selectAll("path")
         .data(geojsonData.features)
         .enter()
         .append("path")
@@ -332,6 +334,16 @@ function drawRepZoneMap(foundBird) {
         return "#949494ff";
         });
     });
+
+    if (window.innerWidth <= 1000) {
+    const zoom = d3.zoom()
+        .scaleExtent([1, 8])
+        .on("zoom", (event) => {
+            g.attr('transform', event.transform);
+        });
+
+    svg.call(zoom);
+}
 }
 
 function showListMode() {
