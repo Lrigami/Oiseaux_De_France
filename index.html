@@ -37,9 +37,9 @@
 
             <section id="views">
                 <ul>
-                    <li><button><span class="material-symbols-outlined">list</span><span>&nbsp;Liste</span></button></li>
-                    <li><button><span class="material-symbols-outlined">view_cozy</span><span>&nbsp;Tuiles</span></button></li>
-                    <li><button><span class="material-symbols-outlined">globe_location_pin</span><span>&nbsp;Carte</span></button></li>
+                    <li><button id="list-view"><span class="material-symbols-outlined">list</span><span>&nbsp;Liste</span></button></li>
+                    <li><button id="card-view"><span class="material-symbols-outlined">view_cozy</span><span>&nbsp;Tuiles</span></button></li>
+                    <li><button id="map-view"><span class="material-symbols-outlined">globe_location_pin</span><span>&nbsp;Carte</span></button></li>
                 </ul>
             </section>
 
@@ -62,9 +62,22 @@
                 </select>
             </section>
 
-            <ul id="new-list">
+            <ul id="cards-of-birds">
 
             </ul>
+
+            <table id="list-of-birds">
+                <thead>
+                    <tr>
+                        <th>Nom Français</th>
+                        <th>Nom scientifique</th>
+                        <th>Ordre</th>
+                    </tr>
+                </thead>
+                <tbody id="dynamic-list-of-birds">
+
+                </tbody>
+            </table>
             
             <div id="popup" class="hidden">
                 <button id="go-back"><span class="material-symbols-outlined">arrow_back</span><span>Retour</span></button>
