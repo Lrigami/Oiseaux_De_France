@@ -1,12 +1,20 @@
 import {birds} from "./data.js";
-const geoJSONUrl = "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson";
 
-const newList = document.getElementById("new-list");
+// boutons des vues
+const listBtn = document.getElementById("list-view");
+const cardBtn = document.getElementById("card-view");
+const mapBtn = document.getElementById("map-view");
+
+// conteneurs pour les vues
+const cardsOfBirds = document.getElementById("cards-of-birds");
+const listOfBirds = document.getElementById("dynamic-list-of-birds");
+
+// Filtres
 const orderFilter = document.getElementById("ordre");
 const triFilter = document.getElementById("tri");
 let orders = [];
-const baseURL = "http://127.0.0.1:5500"
 
+// Vue en tuiles
 // générer la liste des oiseaux selon les données
 function displayBird(arr) {
     arr.forEach(bird => {
@@ -14,6 +22,8 @@ function displayBird(arr) {
 
         let birdElement = document.createElement("li");
         birdElement.classList.add("bird-card");
+        birdElement.classList.add(bird.ordre);
+        birdElement.id = `${birdName}`;
 
         let birdImg = document.createElement("img");
         birdImg.setAttribute("src", bird.photo);
@@ -24,16 +34,10 @@ function displayBird(arr) {
         let birdTitle = document.createElement("h3");
         birdTitle.innerText = bird.name;
 
-        let seeMoreBtn = document.createElement("button");
-        seeMoreBtn.innerHTML = `<span>Le découvrir&nbsp;</Span><span class=material-symbols-outlined>arrow_forward</span>`;
-        seeMoreBtn.id = `${birdName}`;
-        seeMoreBtn.classList.add("see-more");
-
         birdInfo.appendChild(birdTitle);
-        birdInfo.appendChild(seeMoreBtn);
         birdElement.appendChild(birdImg);
         birdElement.appendChild(birdInfo);
-        newList.appendChild(birdElement);
+        cardsOfBirds.appendChild(birdElement);
 
         if (!orders.includes(bird.ordre)) {
             orders.push(bird.ordre);
@@ -58,14 +62,13 @@ orderFilter.addEventListener("change", (e) => {
 
     let allBirds = document.querySelectorAll(".bird-card");
     allBirds.forEach(bird => {
-        let birdOrder = bird.querySelector("p.bird-order");
-        birdOrder.textContent.includes(selectedOrder) ? bird.classList.remove("hidden") : bird.classList.add("hidden");
+        bird.classList.contains(selectedOrder) ? bird.classList.remove("hidden") : bird.classList.add("hidden");
     })
 })
 
 // gestion du tri
 triFilter.addEventListener("change", (e) => {
-    newList.innerHTML = "";
+    cardsOfBirds.innerHTML = "";
     let filteredBirdsArr = [...birds];
     let selectedTri = e.target.value;
 
@@ -92,8 +95,12 @@ triFilter.addEventListener("change", (e) => {
     }
     let allBirds = document.querySelectorAll(".bird-card");
     allBirds.forEach(bird => {
-        let birdOrder = bird.querySelector("p.bird-order");
-        birdOrder.textContent.includes(orderFilter.value) ? bird.classList.remove("hidden") : bird.classList.add("hidden");
+        let selectedOrdre = orderFilter.value;
+        if (selectedOrdre === "") {
+            return;
+        } else {
+            bird.classList.contains(selectedOrdre) ? bird.classList.remove("hidden") : bird.classList.add("hidden");
+        }
     })
 })
 
@@ -111,11 +118,10 @@ let timelineMigration = document.getElementById("timeline-de-migration");
 let sonsListe = document.getElementById("sons");
 let galerieOiseau = document.getElementById("galerie");
 
-let allSeeMore = document.querySelectorAll(".see-more");
-allSeeMore.forEach(seeMorebtn => {
-    seeMorebtn.addEventListener("click", (e) => {
+window.addEventListener("click", (e) => {
+    if (e.target.closest("li") && e.target.closest("li").classList.contains("bird-card")) {
         popup.classList.toggle("hidden");
-        let selectedBird = e.target.closest("button").id.split(".").join(" ");
+        let selectedBird = e.target.closest("li").id.split(".").join(" ");
 
         let foundBird = birds.find(bird => bird.name.toLowerCase() == selectedBird);
         
@@ -128,6 +134,7 @@ allSeeMore.forEach(seeMorebtn => {
         longeviteOiseau.innerText = foundBird.longevite;
         conservationOiseau.innerText = foundBird.menace;
 
+        // zones de répartition avec D3.js
         const zoneRepWidth = 800;
         const zoneRepHeight = 500;
         const svg = d3.select(zoneRepartition);
@@ -156,16 +163,17 @@ allSeeMore.forEach(seeMorebtn => {
             return "#949494ff";
             });
         });
-    })
+    } else if (!popup.classList.contains("hidden") && !popup.contains(e.target)) {
+        popup.classList.toggle("hidden");
+    } else if (popup.querySelector("#go-back").contains(e.target)) {
+        const svg = d3.select(zoneRepartition);
+        svg.selectAll("*").remove();
+        popup.classList.toggle("hidden");
+    } else if (listBtn.contains(e.target)) {
+        cardsOfBirds.classList.add("hidden");
+        listOfBirds.classList.remove("hidden");
+    } else if (cardBtn.contains(e.target)) {
+        listOfBirds.classList.add("hidden");
+        cardsOfBirds.classList.remove("hidden");
+    }
 })
-
-let goBackBtn = document.getElementById("go-back");
-goBackBtn.addEventListener("click", () => {
-    const svg = d3.select(zoneRepartition);
-    svg.selectAll("*").remove();
-    popup.classList.toggle("hidden");
-})
-
-// gérer aussi que si on clique en dehors du popup, on sort du popup
-
-// zones de répartition avec D3.js
