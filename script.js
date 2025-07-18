@@ -10,9 +10,29 @@ const cardsOfBirds = document.getElementById("cards-of-birds");
 const listOfBirds = document.getElementById("dynamic-list-of-birds");
 
 // Filtres
+const filtres = document.getElementById("filters");
 const orderFilter = document.getElementById("ordre");
 const triFilter = document.getElementById("tri");
 let orders = [];
+
+// Boutons de tri du tableau
+const nomFr = document.getElementById("nom-fr");
+const nomSci = document.getElementById("nom-sci");
+const nomOrdre = document.getElementById("nom-ordre");
+
+// popup 
+let popup = document.getElementById("popup");
+let photoOiseau = document.getElementById("photo-oiseau");
+let nomOiseau = document.getElementById("nom-oiseau");
+let tailleOiseau = document.getElementById("taille-oiseau");
+let envergureOiseau = document.getElementById("envergure-oiseau");
+let poidsOiseau = document.getElementById("poids-oiseau");
+let longeviteOiseau = document.getElementById("longevite-oiseau");
+let conservationOiseau = document.getElementById("conservation-oiseau");
+let zoneRepartition = document.getElementById("zones-de-repartition");
+let timelineMigration = document.getElementById("timeline-de-migration");
+let sonsListe = document.getElementById("sons");
+let galerieOiseau = document.getElementById("galerie");
 
 // Vue en tuiles
 // générer la liste des oiseaux selon les données
@@ -20,6 +40,7 @@ function displayBird(arr) {
     arr.forEach(bird => {
         let birdName = bird.name.toLowerCase().split(" ").join(".");
 
+        // pour les cartes
         let birdElement = document.createElement("li");
         birdElement.classList.add("bird-card");
         birdElement.classList.add(bird.ordre);
@@ -38,6 +59,24 @@ function displayBird(arr) {
         birdElement.appendChild(birdImg);
         birdElement.appendChild(birdInfo);
         cardsOfBirds.appendChild(birdElement);
+
+        // pour la liste sous forme de tableau
+        let birdRow = document.createElement("tr");
+        let birdFirstCell = document.createElement("td");
+        birdFirstCell.classList.add(birdName);
+        birdFirstCell.classList.add("bird-link");
+        birdFirstCell.innerText = bird.name;
+
+        let birdSecCell = document.createElement("td");
+        birdSecCell.innerText = "" // mettre plus tard le nom scientifique;
+
+        let birdThirdCell = document.createElement("td");
+        birdThirdCell.innerText = bird.ordre;
+
+        birdRow.appendChild(birdFirstCell);
+        birdRow.appendChild(birdSecCell);
+        birdRow.appendChild(birdThirdCell);
+        listOfBirds.appendChild(birdRow);
 
         if (!orders.includes(bird.ordre)) {
             orders.push(bird.ordre);
@@ -104,24 +143,16 @@ triFilter.addEventListener("change", (e) => {
     })
 })
 
-// popup 
-let popup = document.getElementById("popup");
-let photoOiseau = document.getElementById("photo-oiseau");
-let nomOiseau = document.getElementById("nom-oiseau");
-let tailleOiseau = document.getElementById("taille-oiseau");
-let envergureOiseau = document.getElementById("envergure-oiseau");
-let poidsOiseau = document.getElementById("poids-oiseau");
-let longeviteOiseau = document.getElementById("longevite-oiseau");
-let conservationOiseau = document.getElementById("conservation-oiseau");
-let zoneRepartition = document.getElementById("zones-de-repartition");
-let timelineMigration = document.getElementById("timeline-de-migration");
-let sonsListe = document.getElementById("sons");
-let galerieOiseau = document.getElementById("galerie");
-
 window.addEventListener("click", (e) => {
-    if (e.target.closest("li") && e.target.closest("li").classList.contains("bird-card")) {
+    if ((e.target.closest("li") && e.target.closest("li").classList.contains("bird-card")) || e.target.classList.contains("bird-link")) {
         popup.classList.toggle("hidden");
-        let selectedBird = e.target.closest("li").id.split(".").join(" ");
+        let selectedBird;
+
+        if (e.target.classList.contains("bird-link")) {
+            selectedBird = e.target.classList[0].split(".").join(" ");
+        } else {
+            selectedBird = e.target.closest("li").id.split(".").join(" ");
+        }
 
         let foundBird = birds.find(bird => bird.name.toLowerCase() == selectedBird);
         
@@ -170,10 +201,51 @@ window.addEventListener("click", (e) => {
         svg.selectAll("*").remove();
         popup.classList.toggle("hidden");
     } else if (listBtn.contains(e.target)) {
+        filtres.classList.add("hidden");
         cardsOfBirds.classList.add("hidden");
         listOfBirds.classList.remove("hidden");
     } else if (cardBtn.contains(e.target)) {
         listOfBirds.classList.add("hidden");
+        filtres.classList.remove("hidden");
         cardsOfBirds.classList.remove("hidden");
+    } else if (nomFr.contains(e.target)) {
+        nomSci.childNodes.item(1).textContent = "arrow_drop_down";
+        nomOrdre.childNodes.item(1).textContent = "arrow_drop_down";
+        listOfBirds.innerHTML = "";
+        let filteredBirdsArr = [...birds];
+        if (nomFr.childNodes.item(1).textContent === "arrow_drop_down") {
+            filteredBirdsArr.sort((a, b) => b.name.localeCompare(a.name));
+            nomFr.childNodes.item(1).textContent = "arrow_drop_up";
+        } else {
+            filteredBirdsArr.sort();
+            nomFr.childNodes.item(1).textContent = "arrow_drop_down";
+        }
+        displayBird(filteredBirdsArr);
+    } else if (nomSci.contains(e.target)) { // attention à changer le code ici une fois que j'aurais récupéré et inséré les noms scientifiques
+        nomFr.childNodes.item(1).textContent = "arrow_drop_down";
+        nomOrdre.childNodes.item(1).textContent = "arrow_drop_down";
+        listOfBirds.innerHTML = "";
+        let filteredBirdsArr = [...birds];
+        if (nomSci.childNodes.item(1).textContent === "arrow_drop_down") {
+            filteredBirdsArr.sort((a, b) => b.name.localeCompare(a.name));
+            nomSci.childNodes.item(1).textContent = "arrow_drop_up";
+        } else {
+            filteredBirdsArr.sort();
+            nomSci.childNodes.item(1).textContent = "arrow_drop_down";
+        }
+        displayBird(filteredBirdsArr);
+    } else if (nomOrdre.contains(e.target)) {
+        nomFr.childNodes.item(1).textContent = "arrow_drop_down";
+        nomSci.childNodes.item(1).textContent = "arrow_drop_down";
+        listOfBirds.innerHTML = "";
+        let filteredBirdsArr = [...birds];
+        if (nomOrdre.childNodes.item(1).textContent === "arrow_drop_down") {
+            filteredBirdsArr.sort((a, b) => b.ordre.localeCompare(a.ordre));
+            nomOrdre.childNodes.item(1).textContent = "arrow_drop_up";
+        } else {
+            filteredBirdsArr.sort((a, b) => a.ordre.localeCompare(b.ordre));
+            nomOrdre.childNodes.item(1).textContent = "arrow_drop_down";
+        }
+        displayBird(filteredBirdsArr);
     }
 })

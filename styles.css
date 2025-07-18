@@ -248,6 +248,25 @@ h3 {
     transform-origin: center;
 }
 
+/* liste */
+table {
+    margin: 20px 0;
+}
+
+table, th, tr, td {
+    border: 1px solid var(--important-text);
+    border-collapse: collapse;
+}
+
+th, td {
+    font-size: 1.2rem;
+    padding: 3px 10px;
+}
+
+.bird-link {
+    cursor: pointer;
+}
+
 /* popup */
 #popup {
     position: fixed;
