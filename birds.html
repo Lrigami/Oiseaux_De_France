@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" href="./assets/logo/favicon.ico" />
+        <link rel="stylesheet" href="styles.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+        <script type="module" src="script.js" defer></script>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <title>Oiseaux de France</title>
+    </head>
+
+    <body>
+        <header>
+            <img src="./assets/logo/logo-full-under-white.png" alt="Logo oiseaux de France blanc entier">
+            <h1>Découvrez les oiseaux près de chez vous.</h1>
+        </header>
+
+        <main>
+            <nav>
+                <img src="./assets/logo/logo-titre.png" alt="Logo oiseaux de France noir partiel">
+                <ul>
+                    <li><a href="./home.html">Home</a></li>
+                    <li><a href="./about.html">About</a></li>
+                    <li><a href="./birds.html">Oiseaux</a></li>
+                    <li><a href="./contact.html">Contact</a></li>
+                </ul>
+                <!-- Barre de recherche -->
+                <p>Recherche</p>
+            </nav>
+
+            <h2>Partez à la rencontre des oiseaux de France.</h2> 
+
+            <section id="views">
+                <ul>
+                    <li><button><span class="material-symbols-outlined">list</span><span>&nbsp;Liste</span></button></li>
+                    <li><button><span class="material-symbols-outlined">view_cozy</span><span>&nbsp;Tuiles</span></button></li>
+                    <li><button><span class="material-symbols-outlined">globe_location_pin</span><span>&nbsp;Carte</span></button></li>
+                </ul>
+            </section>
+
+            <section id="filters">
+                <label for="ordre">Sélectionnez un ordre&nbsp;:&nbsp;</label> 
+                <select name="ordres-oiseaux" id="ordre">
+                    <option value="">-- Choisissez une option</option>
+                </select>
+
+                <label for="tri">Triez par&nbsp;:&nbsp;</label> 
+                <select name="tri-oiseaux" id="tri">
+                    <option value="">-- Choisissez une option</option>
+                    <option value="alph">ordre alphabétique</option>
+                    <option value="env-cr">envergure (croissant)</option>
+                    <option value="env-decr">envergure (décroissant)</option>
+                    <option value="taille-cr">Taille (croissant)</option>
+                    <option value="taille-decr">Taille (décroissant)</option>
+                    <option value="poids-cr">Poids (croissant)</option>
+                    <option value="poids-decr">Poids (décroissant)</option>
+                </select>
+            </section>
+
+            <ul id="new-list">
+
+            </ul>
+            
+            <div id="popup" class="hidden">
+                <button id="go-back"><span class="material-symbols-outlined">arrow_back</span><span>Retour</span></button>
+                <div id="infos-container">
+                    <h3 id="nom-oiseau"></h3>
+                    <section id="infos-oiseau">
+                        <img id="photo-oiseau" src="" alt="">
+                        <div>
+                            <p><span class="bold">Taille min.&nbsp;:&nbsp;</span><span id="taille-oiseau"></span></p>
+                            <p><span class="bold">Envergure min.&nbsp;:&nbsp;</span><span id="envergure-oiseau"></span></p>
+                            <p><span class="bold">Poids min.&nbsp;:&nbsp;</span><span id="poids-oiseau"></span></p>
+                            <p><span class="bold">Longévité&nbsp;:&nbsp;</span><span id="longevite-oiseau"></span></p>
+                            <p><span class="bold">Statut de conservation UICN&nbsp;:&nbsp;</span><span id="conservation-oiseau"></span></p>
+                        </div>
+                    </section>
+                    <section>
+                        <h4>Zones de répartition</h4>
+                        <svg id="zones-de-repartition"></svg>
+                        <legend>
+                            <ul>
+                                <li><div class="zone-rep-legend" style="background-color: #4ece81;"></div><span>Présent et/ou nicheur</span></li>
+                                <li><div class="zone-rep-legend" style="background-color: #9adfb6ff"></div><span>Introduit/Réintroduit</span></li>
+                                <li><div class="zone-rep-legend" style="background-color: #b5e0ffff;"></div><span>Rare/Occasionnel</span></li>
+                                <li><div class="zone-rep-legend" style="background-color: #fbf5b6ff;"></div><span>Présence incertaine</span></li>
+                                <li><div class="zone-rep-legend" style="background-color: #fcd694ff;"></div><span>Extinction probable</span></li>
+                                <li><div class="zone-rep-legend" style="background-color: #ff6060ff;"></div><span>Extinction certaine</span></li>
+                            </ul>
+                        </legend>
+                    </section>
+                    <section>
+                        <h4>Timeline de migration</h4>
+                        <div id="timeline-de-migration"></div>
+                    </section>
+                    <section>
+                        <h4>Ecoutez-le</h4>
+                        <ul id="sons">
+
+                        </ul>
+                    </section>
+                    <section>
+                        <h4>Galerie</h4>
+                        <ul id="galerie">
+
+                        </ul>
+                    </section>
+                </div>  
+            </div>
+        </main>
+
+        <footer>
+            2025 - C2RT Bird Page
+        </footer>
+
+    </body>
+</html>
