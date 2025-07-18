@@ -144,14 +144,45 @@ triFilter.addEventListener("change", (e) => {
 })
 
 window.addEventListener("click", (e) => {
-    if ((e.target.closest("li") && e.target.closest("li").classList.contains("bird-card")) || e.target.classList.contains("bird-link")) {
+    const target = e.target;
+
+    if (isBirdClicked(target)) {
+        openPopup(target)        
+    } else if (isOutsidePopupClick(target) || isGoBackClick(target)) {
+        hidePopup();
+    } else if (listBtn.contains(target)) {
+        showListMode();
+    } else if (cardBtn.contains(target)) {
+        showCardMode();
+    } else if (nomFr.contains(target)) {
+        sortBirdTable("fr")
+    } else if (nomSci.contains(target)) { 
+        sortBirdTable("sci")
+    } else if (nomOrdre.contains(target)) {
+        sortBirdTable("ordre")
+    }
+})
+
+function isBirdClicked(target) {
+    return ((target.closest("li") && target.closest("li").classList.contains("bird-card")) || target.classList.contains("bird-link"));
+}
+
+function isOutsidePopupClick(target) {
+    return (!popup.classList.contains("hidden") && !popup.contains(target))
+}
+
+function isGoBackClick(target) {
+    return (popup.querySelector("#go-back").contains(target));
+}
+
+function openPopup(target) {
         popup.classList.toggle("hidden");
         let selectedBird;
 
-        if (e.target.classList.contains("bird-link")) {
-            selectedBird = e.target.classList[0].split(".").join(" ");
+        if (target.classList.contains("bird-link")) {
+            selectedBird = target.classList[0].split(".").join(" ");
         } else {
-            selectedBird = e.target.closest("li").id.split(".").join(" ");
+            selectedBird = target.closest("li").id.split(".").join(" ");
         }
 
         let foundBird = birds.find(bird => bird.name.toLowerCase() == selectedBird);
@@ -165,6 +196,16 @@ window.addEventListener("click", (e) => {
         longeviteOiseau.innerText = foundBird.longevite;
         conservationOiseau.innerText = foundBird.menace;
 
+        drawMap(foundBird)
+}
+
+function hidePopup() {
+    const svg = d3.select(zoneRepartition);
+    svg.selectAll("*").remove();
+    popup.classList.toggle("hidden");
+}
+
+function drawMap(foundBird) {
         // zones de répartition avec D3.js
         const zoneRepWidth = 800;
         const zoneRepHeight = 500;
@@ -185,67 +226,60 @@ window.addEventListener("click", (e) => {
             .attr("d", path)
             .attr("stroke", "#fff")
             .attr("fill", d => {
-            if (foundBird.zonesderepartition.present && foundBird.zonesderepartition.present.includes(d.properties.name)) return "#4ece81";
-            if (foundBird.zonesderepartition.introduit && foundBird.zonesderepartition.introduit.includes(d.properties.name)) return "#9adfb6ff";
-            if (foundBird.zonesderepartition.rare && foundBird.zonesderepartition.rare.includes(d.properties.name)) return "#b5e0ffff";
-            if (foundBird.zonesderepartition.incertain && foundBird.zonesderepartition.incertain.includes(d.properties.name)) return "#fbf5b6ff";
-            if (foundBird.zonesderepartition.extprob && foundBird.zonesderepartition.extprob.includes(d.properties.name)) return "#fcd694ff";
-            if (foundBird.zonesderepartition.eteint && foundBird.zonesderepartition.eteint.includes(d.properties.name)) return "#ff6060ff";
+            const z = foundBird.zonesderepartition;
+            const name = d.properties.name;
+            if (z.present?.includes(name)) return "#4ece81";
+            if (z.introduit?.includes(name)) return "#9adfb6ff";
+            if (z.rare?.includes(name)) return "#b5e0ffff";
+            if (z.incertain?.includes(name)) return "#fbf5b6ff";
+            if (z.extprob?.includes(name)) return "#fcd694ff";
+            if (z.eteint?.includes(name)) return "#ff6060ff";
             return "#949494ff";
             });
         });
-    } else if (!popup.classList.contains("hidden") && !popup.contains(e.target)) {
-        popup.classList.toggle("hidden");
-    } else if (popup.querySelector("#go-back").contains(e.target)) {
-        const svg = d3.select(zoneRepartition);
-        svg.selectAll("*").remove();
-        popup.classList.toggle("hidden");
-    } else if (listBtn.contains(e.target)) {
-        filtres.classList.add("hidden");
-        cardsOfBirds.classList.add("hidden");
-        listOfBirds.classList.remove("hidden");
-    } else if (cardBtn.contains(e.target)) {
-        listOfBirds.classList.add("hidden");
-        filtres.classList.remove("hidden");
-        cardsOfBirds.classList.remove("hidden");
-    } else if (nomFr.contains(e.target)) {
-        nomSci.childNodes.item(1).textContent = "arrow_drop_down";
-        nomOrdre.childNodes.item(1).textContent = "arrow_drop_down";
-        listOfBirds.innerHTML = "";
-        let filteredBirdsArr = [...birds];
-        if (nomFr.childNodes.item(1).textContent === "arrow_drop_down") {
-            filteredBirdsArr.sort((a, b) => b.name.localeCompare(a.name));
-            nomFr.childNodes.item(1).textContent = "arrow_drop_up";
-        } else {
-            filteredBirdsArr.sort();
-            nomFr.childNodes.item(1).textContent = "arrow_drop_down";
+}
+
+function showListMode() {
+    filtres.classList.add("hidden");
+    cardsOfBirds.classList.add("hidden");
+    listOfBirds.classList.remove("hidden");
+}
+
+function showCardMode() {
+    listOfBirds.classList.add("hidden");
+    filtres.classList.remove("hidden");
+    cardsOfBirds.classList.remove("hidden");
+}
+
+function sortBirdTable(type) {
+    listOfBirds.innerHTML = "";
+    let filteredBirdsArr = [...birds];
+
+    const config = [
+        { type: "fr", el: nomFr, key: "name" },
+        { type: "sci", el: nomSci, key: "name" }, // remplacer plus tard par le nom scientifique que j'aurais mis en data 
+        { type: "ordre", el: nomOrdre, key: "ordre" }
+    ];
+
+    const ele = config.find(obj => obj.type === type).el;
+    const key = config.find(obj => obj.type === type).key;
+
+    config.forEach(obj => {
+        if (obj.type !== type) {
+            obj.el.childNodes.item(1).textContent = "arrow_drop_down";
         }
-        displayBird(filteredBirdsArr);
-    } else if (nomSci.contains(e.target)) { // attention à changer le code ici une fois que j'aurais récupéré et inséré les noms scientifiques
-        nomFr.childNodes.item(1).textContent = "arrow_drop_down";
-        nomOrdre.childNodes.item(1).textContent = "arrow_drop_down";
-        listOfBirds.innerHTML = "";
-        let filteredBirdsArr = [...birds];
-        if (nomSci.childNodes.item(1).textContent === "arrow_drop_down") {
-            filteredBirdsArr.sort((a, b) => b.name.localeCompare(a.name));
-            nomSci.childNodes.item(1).textContent = "arrow_drop_up";
-        } else {
-            filteredBirdsArr.sort();
-            nomSci.childNodes.item(1).textContent = "arrow_drop_down";
-        }
-        displayBird(filteredBirdsArr);
-    } else if (nomOrdre.contains(e.target)) {
-        nomFr.childNodes.item(1).textContent = "arrow_drop_down";
-        nomSci.childNodes.item(1).textContent = "arrow_drop_down";
-        listOfBirds.innerHTML = "";
-        let filteredBirdsArr = [...birds];
-        if (nomOrdre.childNodes.item(1).textContent === "arrow_drop_down") {
-            filteredBirdsArr.sort((a, b) => b.ordre.localeCompare(a.ordre));
-            nomOrdre.childNodes.item(1).textContent = "arrow_drop_up";
-        } else {
-            filteredBirdsArr.sort((a, b) => a.ordre.localeCompare(b.ordre));
-            nomOrdre.childNodes.item(1).textContent = "arrow_drop_down";
-        }
-        displayBird(filteredBirdsArr);
-    }
-})
+    })
+
+    const arrow = ele.childNodes.item(1);
+    const isDescending = arrow.textContent === "arrow_drop_down";
+
+    filteredBirdsArr.sort((a, b) =>
+        isDescending
+            ? b[key].localeCompare(a[key])
+            : a[key].localeCompare(b[key])
+    );
+
+    arrow.textContent = isDescending ? "arrow_drop_up" : "arrow_drop_down";
+
+    displayBird(filteredBirdsArr);
+} 
