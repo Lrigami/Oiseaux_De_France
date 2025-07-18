@@ -96,7 +96,7 @@ nav {
     background-color: var(--second-background);
     position: sticky;
     top: 0;
-    z-index: 9;
+    z-index: 2;
     display: flex;
     align-items: center;
     justify-content: space-around;
@@ -154,7 +154,7 @@ h2 {
     background-color: var(--second-btn-hover);
 }
 
-#views ul button:focus, views ul button:active, #go-back:focus, #go-back:active {
+#views ul button:focus, #views ul button:active, #go-back:focus, #go-back:active {
     background-color: var(--second-btn-active);
 }
 
@@ -166,7 +166,7 @@ h2 {
 }
 
 /* tuiles */
-#new-list {
+#cards-of-birds {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
@@ -184,7 +184,6 @@ h2 {
     border-radius: 5px 5px 0 0;
     cursor: pointer;
     margin: 15px;
-    transition: 0.5s;
     overflow: hidden;
 }
 
@@ -202,9 +201,9 @@ h2 {
 
 h3 {
     color: white;
-    text-align: center;
+    text-align: center;   
+    margin: auto;
     font-size: 1.3rem;
-    margin: 5px 0;
 }
 
 .bird-card button {
@@ -261,6 +260,7 @@ h3 {
     border-radius: 5px;
     padding: 10px;
     overflow: scroll;
+    z-index: 3;
 }
 
 #infos-container {
@@ -310,6 +310,7 @@ h4 {
 #zones-de-repartition {
     width: inherit;
     height: 500px;
+    max-width: 850px;
 }
 
 legend ul {
