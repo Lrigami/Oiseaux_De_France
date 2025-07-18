@@ -335,6 +335,8 @@ function drawRepZoneMap(foundBird) {
 }
 
 function showListMode() {
+    countryBirds.innerHTML = "";
+    countryBirds.classList.add("hidden");
     filtres.classList.add("hidden");
     cardsOfBirds.classList.add("hidden");
     mapContainer.classList.add("hidden");
@@ -342,6 +344,8 @@ function showListMode() {
 }
 
 function showCardMode() {
+    countryBirds.innerHTML = "";
+    countryBirds.classList.add("hidden");
     tableOfBirds.classList.add("hidden");
     mapContainer.classList.add("hidden");
     filtres.classList.remove("hidden");
@@ -351,7 +355,8 @@ function showCardMode() {
 function showMapMode() {
     tableOfBirds.classList.add("hidden");
     filtres.classList.add("hidden");
-    cardsOfBirds.classList.add("hidden");    
+    cardsOfBirds.classList.add("hidden");  
+    countryBirds.classList.remove("hidden");  
     mapContainer.classList.remove("hidden");
 }
 
