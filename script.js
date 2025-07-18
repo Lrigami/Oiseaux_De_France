@@ -9,6 +9,10 @@ const mapBtn = document.getElementById("map-view");
 const cardsOfBirds = document.getElementById("cards-of-birds");
 const tableOfBirds = document.getElementById("list-of-birds");
 const listOfBirds = document.getElementById("dynamic-list-of-birds");
+const mapContainer = document.getElementById("map-container");
+const mapOfBirds = document.getElementById("map-of-birds");
+const countryBirds = document.getElementById("country-birds");
+const countries = [];
 
 // Filtres
 const filtres = document.getElementById("filters");
@@ -35,7 +39,6 @@ let timelineMigration = document.getElementById("timeline-de-migration");
 let sonsListe = document.getElementById("sons");
 let galerieOiseau = document.getElementById("galerie");
 
-// Vue en tuiles
 // générer la liste des oiseaux selon les données
 function displayBird(arr) {
     arr.forEach(bird => {
@@ -79,6 +82,19 @@ function displayBird(arr) {
         birdRow.appendChild(birdThirdCell);
         listOfBirds.appendChild(birdRow);
 
+        // pour la carte du monde 
+        if (bird.zonesderepartition) {
+            let zone = bird.zonesderepartition;
+            let wantedStates = ["present", "reintroduit", "rare"];
+            Object.entries(zone).forEach(([state, countryList]) => {
+                if (wantedStates.includes(state)) {
+                    countryList.forEach(country => {
+                        if (!countries.includes(country)) countries.push(country);
+                    }) 
+                }
+            });
+        }
+
         if (!orders.includes(bird.ordre)) {
             orders.push(bird.ordre);
         }
@@ -86,6 +102,82 @@ function displayBird(arr) {
 }
 
 displayBird(birds);
+
+function displayBirdByCountry(country) {
+    countryBirds.innerHTML = "";
+    birds.forEach(bird => {
+        if (bird.zonesderepartition?.present?.includes(country) || bird.zonesderepartition?.reintroduit?.includes(country) || bird.zonesderepartition?.rare?.includes(country)) {
+            let birdName = bird.name.toLowerCase().split(" ").join(".");
+
+            let birdElement = document.createElement("li");
+            birdElement.classList.add("bird-card");
+            birdElement.classList.add(bird.ordre);
+            birdElement.id = `${birdName}`;
+
+            let birdImg = document.createElement("img");
+            birdImg.setAttribute("src", bird.photo);
+            birdImg.setAttribute("alt", bird.name);
+
+            let birdInfo = document.createElement("div");
+
+            let birdTitle = document.createElement("h3");
+            birdTitle.innerText = bird.name;
+
+            birdInfo.appendChild(birdTitle);
+            birdElement.appendChild(birdImg);
+            birdElement.appendChild(birdInfo);
+            countryBirds.appendChild(birdElement);
+        }
+    })
+}
+
+
+function drawWorldMap() {
+    // zones de répartition avec D3.js
+    const zoneRepWidth = 1200;
+    const zoneRepHeight = 700;
+
+    const svg = d3.select(mapOfBirds)
+        .attr("width", zoneRepWidth)
+        .attr("height", zoneRepHeight);
+
+    const g = svg.append("g");
+
+    const projection = d3.geoMercator()
+    .scale(250)
+    .translate([zoneRepWidth / 2, zoneRepHeight / 1.5]);
+
+    const path = d3.geoPath().projection(projection);
+
+    d3.json("./countries.json")
+    .then(function(geojsonData) {
+        g.selectAll("path")
+        .data(geojsonData.features)
+        .enter()
+        .append("path")
+        .attr("d", path)
+        .attr("stroke", "#fff")
+        .attr("fill", d => {
+            const c = countries;
+            const name = d.properties.name;
+            return c.includes(name) ? "#a1e4baff" : "#949494ff";
+        })
+        .on("click", function (event, d) {
+            const countryName = d.properties.name;
+            displayBirdByCountry(countryName);
+        });
+    });
+
+    const zoom = d3.zoom()
+        .scaleExtent([1, 8])
+        .on("zoom", (event) => {
+            g.attr('transform', event.transform);
+        });
+
+    svg.call(zoom);
+}
+
+drawWorldMap();
 
 // générer la liste des filtres par ordre 
 orders.sort();
@@ -155,6 +247,8 @@ window.addEventListener("click", (e) => {
         showListMode();
     } else if (cardBtn.contains(target)) {
         showCardMode();
+    } else if (mapBtn.contains(target)) {
+        showMapMode();
     } else if (nomFr.contains(target)) {
         sortBirdTable("fr")
     } else if (nomSci.contains(target)) { 
@@ -197,7 +291,7 @@ function openPopup(target) {
         longeviteOiseau.innerText = foundBird.longevite;
         conservationOiseau.innerText = foundBird.menace;
 
-        drawMap(foundBird)
+        drawRepZoneMap(foundBird)
 }
 
 function hidePopup() {
@@ -206,50 +300,59 @@ function hidePopup() {
     popup.classList.toggle("hidden");
 }
 
-function drawMap(foundBird) {
-        // zones de répartition avec D3.js
-        const zoneRepWidth = 800;
-        const zoneRepHeight = 500;
-        const svg = d3.select(zoneRepartition);
+function drawRepZoneMap(foundBird) {
+    // zones de répartition avec D3.js
+    const zoneRepWidth = 800;
+    const zoneRepHeight = 500;
+    const svg = d3.select(zoneRepartition);
 
-        const projection = d3.geoMercator()
-        .scale(130)
-        .translate([zoneRepWidth / 2, zoneRepHeight / 1.5]);
+    const projection = d3.geoMercator()
+    .scale(130)
+    .translate([zoneRepWidth / 2, zoneRepHeight / 1.5]);
 
-        const path = d3.geoPath().projection(projection);
+    const path = d3.geoPath().projection(projection);
 
-        d3.json("./countries.json")
-        .then(function(geojsonData) {
-            svg.selectAll("path")
-            .data(geojsonData.features)
-            .enter()
-            .append("path")
-            .attr("d", path)
-            .attr("stroke", "#fff")
-            .attr("fill", d => {
-            const z = foundBird.zonesderepartition;
-            const name = d.properties.name;
-            if (z.present?.includes(name)) return "#4ece81";
-            if (z.introduit?.includes(name)) return "#9adfb6ff";
-            if (z.rare?.includes(name)) return "#b5e0ffff";
-            if (z.incertain?.includes(name)) return "#fbf5b6ff";
-            if (z.extprob?.includes(name)) return "#fcd694ff";
-            if (z.eteint?.includes(name)) return "#ff6060ff";
-            return "#949494ff";
-            });
+    d3.json("./countries.json")
+    .then(function(geojsonData) {
+        svg.selectAll("path")
+        .data(geojsonData.features)
+        .enter()
+        .append("path")
+        .attr("d", path)
+        .attr("stroke", "#fff")
+        .attr("fill", d => {
+        const z = foundBird.zonesderepartition;
+        const name = d.properties.name;
+        if (z.present?.includes(name)) return "#4ece81";
+        if (z.introduit?.includes(name)) return "#9adfb6ff";
+        if (z.rare?.includes(name)) return "#b5e0ffff";
+        if (z.incertain?.includes(name)) return "#fbf5b6ff";
+        if (z.extprob?.includes(name)) return "#fcd694ff";
+        if (z.eteint?.includes(name)) return "#ff6060ff";
+        return "#949494ff";
         });
+    });
 }
 
 function showListMode() {
     filtres.classList.add("hidden");
     cardsOfBirds.classList.add("hidden");
+    mapContainer.classList.add("hidden");
     tableOfBirds.classList.remove("hidden");
 }
 
 function showCardMode() {
     tableOfBirds.classList.add("hidden");
+    mapContainer.classList.add("hidden");
     filtres.classList.remove("hidden");
     cardsOfBirds.classList.remove("hidden");
+}
+
+function showMapMode() {
+    tableOfBirds.classList.add("hidden");
+    filtres.classList.add("hidden");
+    cardsOfBirds.classList.add("hidden");    
+    mapContainer.classList.remove("hidden");
 }
 
 function sortBirdTable(type) {

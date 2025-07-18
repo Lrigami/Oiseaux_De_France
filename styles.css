@@ -166,7 +166,7 @@ h2 {
 }
 
 /* tuiles */
-#cards-of-birds {
+#cards-of-birds, #country-birds{
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
@@ -265,6 +265,21 @@ th, td {
 
 .bird-link {
     cursor: pointer;
+}
+
+/* map */
+#map-container {
+    border: 1px solid var(--important-text);
+}
+
+#map-of-birds {
+    width: 1400px;
+    height: 800px;
+    cursor: pointer;
+}
+
+#map-of-birds:active, #map-of-birds:focus {
+    cursor: grabbing;
 }
 
 /* popup */
