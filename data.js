@@ -645,7 +645,7 @@ export const birds = [
     {
         name: "Faucon lanier",
         photo: "https://www.oiseaux.net/photos/gregoire.trunet/images/id/faucon.lanier.grtr.1p.jpg", 
-        ordre: "FaLC (Préoccupation mineure)oniformes", 
+        ordre: "Falconiformes", 
         envergure: 90, 
         taille: 50, 
         poids: 700, 
