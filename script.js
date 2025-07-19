@@ -44,56 +44,64 @@ function displayBird(arr) {
     arr.forEach(bird => {
         let birdName = bird.name.toLowerCase().split(" ").join(".");
 
-        // pour les cartes
-        let birdElement = document.createElement("li");
-        birdElement.classList.add("bird-card");
-        birdElement.classList.add(bird.ordre);
-        birdElement.id = `${birdName}`;
+        // pour les cartes  
+        if (!cardsOfBirds.classList.contains("hidden")) {
+            let birdElement = document.createElement("li");
+            birdElement.classList.add("bird-card");
+            birdElement.classList.add(bird.ordre);
+            birdElement.id = `${birdName}`;
 
-        let birdImg = document.createElement("img");
-        birdImg.setAttribute("src", bird.photo);
-        birdImg.setAttribute("alt", bird.name);
+            let birdImg = document.createElement("img");
+            birdImg.setAttribute("src", bird.photo);
+            birdImg.setAttribute("alt", bird.name);
 
-        let birdInfo = document.createElement("div");
+            let birdInfo = document.createElement("div");
 
-        let birdTitle = document.createElement("h3");
-        birdTitle.innerText = bird.name;
+            let birdTitle = document.createElement("h3");
+            birdTitle.innerText = bird.name;
 
-        birdInfo.appendChild(birdTitle);
-        birdElement.appendChild(birdImg);
-        birdElement.appendChild(birdInfo);
-        cardsOfBirds.appendChild(birdElement);
-
+            birdInfo.appendChild(birdTitle);
+            birdElement.appendChild(birdImg);
+            birdElement.appendChild(birdInfo);
+            cardsOfBirds.appendChild(birdElement); 
+        }
+        
         // pour la liste sous forme de tableau
-        let birdRow = document.createElement("tr");
-        let birdFirstCell = document.createElement("td");
-        birdFirstCell.classList.add(birdName);
-        birdFirstCell.classList.add("bird-link");
-        birdFirstCell.innerText = bird.name;
+        else if (!tableOfBirds.classList.contains("hidden")) {
+            let birdRow = document.createElement("tr");
+            let birdFirstCell = document.createElement("td");
+            birdFirstCell.classList.add(birdName);
+            birdFirstCell.classList.add("bird-link");
+            birdFirstCell.innerText = bird.name;
 
-        let birdSecCell = document.createElement("td");
-        birdSecCell.innerText = "" // mettre plus tard le nom scientifique;
+            let birdSecCell = document.createElement("td");
+            birdSecCell.innerText = "" // mettre plus tard le nom scientifique;
 
-        let birdThirdCell = document.createElement("td");
-        birdThirdCell.innerText = bird.ordre;
+            let birdThirdCell = document.createElement("td");
+            birdThirdCell.innerText = bird.ordre;
 
-        birdRow.appendChild(birdFirstCell);
-        birdRow.appendChild(birdSecCell);
-        birdRow.appendChild(birdThirdCell);
-        listOfBirds.appendChild(birdRow);
+            birdRow.appendChild(birdFirstCell);
+            birdRow.appendChild(birdSecCell);
+            birdRow.appendChild(birdThirdCell);
+            listOfBirds.appendChild(birdRow);
+        }
+
 
         // pour la carte du monde 
-        if (bird.zonesderepartition) {
-            let zone = bird.zonesderepartition;
-            let wantedStates = ["present", "reintroduit", "rare"];
-            Object.entries(zone).forEach(([state, countryList]) => {
-                if (wantedStates.includes(state)) {
-                    countryList.forEach(country => {
-                        if (!countries.includes(country)) countries.push(country);
-                    }) 
-                }
-            });
+        else if (!mapContainer.classList.contains("hidden")) {
+            if (bird.zonesderepartition) {
+                let zone = bird.zonesderepartition;
+                let wantedStates = ["present", "reintroduit", "rare"];
+                Object.entries(zone).forEach(([state, countryList]) => {
+                    if (wantedStates.includes(state)) {
+                        countryList.forEach(country => {
+                            if (!countries.includes(country)) countries.push(country);
+                        }) 
+                    }
+                });
+            }
         }
+
 
         if (!orders.includes(bird.ordre)) {
             orders.push(bird.ordre);
@@ -177,8 +185,6 @@ function drawWorldMap() {
     svg.call(zoom);
 }
 
-drawWorldMap();
-
 // générer la liste des filtres par ordre 
 orders.sort();
 orders.forEach(order => {
@@ -191,11 +197,17 @@ orders.forEach(order => {
 // gestion du filtre par ordre
 orderFilter.addEventListener("change", (e) => {
     let selectedOrder = e.target.value;
-
     let allBirds = document.querySelectorAll(".bird-card");
-    allBirds.forEach(bird => {
-        bird.classList.contains(selectedOrder) ? bird.classList.remove("hidden") : bird.classList.add("hidden");
-    })
+
+    if (selectedOrder !== "") {
+        allBirds.forEach(bird => {
+            bird.classList.contains(selectedOrder) ? bird.classList.remove("hidden") : bird.classList.add("hidden");
+        })
+    } else {
+        allBirds.forEach(bird => {
+            bird.classList.remove("hidden");
+        })
+    }
 })
 
 // gestion du tri
@@ -245,10 +257,13 @@ window.addEventListener("click", (e) => {
         hidePopup();
     } else if (listBtn.contains(target)) {
         showListMode();
+        displayBird(birds);
     } else if (cardBtn.contains(target)) {
         showCardMode();
     } else if (mapBtn.contains(target)) {
         showMapMode();
+        displayBird(birds);
+        drawWorldMap();
     } else if (nomFr.contains(target)) {
         sortBirdTable("fr")
     } else if (nomSci.contains(target)) { 
@@ -325,12 +340,12 @@ function drawRepZoneMap(foundBird) {
         .attr("fill", d => {
         const z = foundBird.zonesderepartition;
         const name = d.properties.name;
-        if (z.present?.includes(name)) return "#4ece81";
-        if (z.introduit?.includes(name)) return "#9adfb6ff";
-        if (z.rare?.includes(name)) return "#b5e0ffff";
-        if (z.incertain?.includes(name)) return "#fbf5b6ff";
-        if (z.extprob?.includes(name)) return "#fcd694ff";
-        if (z.eteint?.includes(name)) return "#ff6060ff";
+        if (z?.present?.includes(name)) return "#4ece81";
+        if (z?.introduit?.includes(name)) return "#9adfb6ff";
+        if (z?.rare?.includes(name)) return "#b5e0ffff";
+        if (z?.incertain?.includes(name)) return "#fbf5b6ff";
+        if (z?.extprob?.includes(name)) return "#fcd694ff";
+        if (z?.eteint?.includes(name)) return "#ff6060ff";
         return "#949494ff";
         });
     });
@@ -374,7 +389,8 @@ function showMapMode() {
 
 function sortBirdTable(type) {
     listOfBirds.innerHTML = "";
-    let filteredBirdsArr = [...birds];
+    let filteredBirdsArr = [];
+    filteredBirdsArr = [...birds];
 
     const config = [
         { type: "fr", el: nomFr, key: "name" },
